@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chess Trail mudou de endereço</title>
+  <link rel="canonical" href="https://chesstrail.github.io/">
+  <meta name="robots" content="noindex">
+  <noscript><meta http-equiv="refresh" content="0; url=https://chesstrail.github.io/"></noscript>
+  <style>body{font:18px/1.5 system-ui,sans-serif;max-width:34em;margin:15vh auto;padding:0 16px;color:#1d2420;background:#f3f4ef}a{color:#1d2420}</style>
+</head>
+<body>
+  <p>A Trilha do Xadrez agora se chama <strong>Chess Trail</strong> e mudou de endereço: <a id="ir" href="https://chesstrail.github.io/">chesstrail.github.io</a>.</p>
+  <p>Levando você até lá, com o seu progresso…</p>
+  <script>
+    // Leva o progresso salvo neste endereço para o novo (o mesmo código de "Copiar meu código")
+    (async () => {
+      const NOVO = "https://chesstrail.github.io/";
+      let destino = NOVO + (location.hash.startsWith("#/") ? location.hash : "");
+      const ir = () => location.replace(destino);
+      const reserva = setTimeout(ir, 2500);
+      try {
+        if ("serviceWorker" in navigator) for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister();
+        if (self.caches) for (const k of await caches.keys()) await caches.delete(k);
+      } catch {}
+      try {
+        const salvo = localStorage.getItem("trilha-xadrez-v1");
+        if (salvo) {
+          const b64 = (bytes) => { let s = ""; bytes.forEach((b) => s += String.fromCharCode(b)); return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); };
+          const bytes = new TextEncoder().encode(salvo);
+          let codigo;
+          if (typeof CompressionStream === "function") {
+            const z = new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream("deflate-raw"))).arrayBuffer());
+            codigo = "TX1." + b64(z);
+          } else codigo = "TX0." + b64(bytes);
+          destino = NOVO + "#importar=" + codigo;
+        }
+      } catch {}
+      clearTimeout(reserva);
+      ir();
+    })();
+  </script>
+</body>
+</html>
